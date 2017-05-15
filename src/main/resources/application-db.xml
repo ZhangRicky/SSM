@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>    
+<beans xmlns="http://www.springframework.org/schema/beans"    
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"    
+    xmlns:context="http://www.springframework.org/schema/context"    
+    xmlns:mvc="http://www.springframework.org/schema/mvc"    
+    xsi:schemaLocation="http://www.springframework.org/schema/beans      
+                        http://www.springframework.org/schema/beans/spring-beans.xsd      
+                        http://www.springframework.org/schema/context      
+                        http://www.springframework.org/schema/context/spring-context.xsd      
+                        http://www.springframework.org/schema/mvc      
+                        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    
+    <!-- 引入配置文件中的信息 -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    	<property name="locations">
+    		<value>classpath:dataSource.properties</value>
+    	</property>
+    </bean>
+    
+    <!-- 配置数据源 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    	<property name="driverClassName" value="${oracle.driver}"></property>
+    	<property name="url" value="${oracle.url}"></property>
+    	<property name="username" value="${oracle.username}"></property>
+    	<property name="password" value="${oracle.password}"></property>
+    	<!-- 初始化连接大小 -->
+    	<property name="initialSize" value="${oracle.initialSize}"></property>
+    	<!-- 最大连接数 -->
+    	<property name="maxActive" value="${oracle.maxActive}"></property>
+    	<!-- 最大空闲 -->
+    	<property name="maxIdle" value="${oracle.maxIdle}"></property>
+    	<!-- 最小空闲 -->
+    	<property name="minIdle" value="${oracle.minIdle}"></property>
+    	<!-- 最长等待时间 -->
+    	<property name="maxWait" value="${oracle.maxWait}"></property>
+    </bean>             
+    
+    <!-- 配置一个模板 -->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+    
+    <!-- 配置Mybatis的文件 ，mapperLocations配置**Mapper.xml文件位置，configLocation配置mybatis-config文件位置-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    	<property name="dataSource" ref="dataSource"></property>
+    	<!-- mybatis主配置 -->
+    	<property name="configLocation" value="classpath:mybatis.cfg.xml"></property>
+    	<!-- 自动扫描mapping文件 -->
+    	<property name="mapperLocations" value="classpath:com/mark/mapper/*.xml"></property>
+    </bean>    
+    
+    <!--  
+        mybatis自动扫描加载Sql映射文件/接口 : MapperScannerConfigurer sqlSessionFactory  
+        basePackage:指定sql映射文件/接口所在的包（自动扫描）  
+    -->  
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  
+        <property name="basePackage"  value="com.mark.mapper" />  
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" /> 
+        <property name="annotationClass" value="com.mark.annotation.MybatisDAO" /> 
+    </bean>    
+</beans>
+                        
+                        
+              
